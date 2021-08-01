@@ -37,6 +37,7 @@ func NewSourceDirectory(source string) (*SourceDirectory, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Failed to find `pdflatex`: %w", err)
 		}
+		log.Printf("Using %s\n", pdflatex)
 	}
 	d := &SourceDirectory{
 		sourcePath: source,

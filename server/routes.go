@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -12,11 +13,11 @@ import (
 )
 
 type TexServer struct {
-	index string
+	index fs.FS
 	src   *latex.SourceDirectory
 }
 
-func NewLatexServer(src *latex.SourceDirectory, index string) *TexServer {
+func NewLatexServer(src *latex.SourceDirectory, index fs.FS) *TexServer {
 	return &TexServer{index, src}
 }
 
@@ -44,7 +45,7 @@ func (s *TexServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *TexServer) serveDir(w http.ResponseWriter, filepath string) {
-	index, err := template.ParseFiles(s.index)
+	index, err := template.ParseFS(s.index, "template/index.html")
 	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "Failed to compile template: %v", err)

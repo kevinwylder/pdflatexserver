@@ -30,10 +30,15 @@ func (d *SourceDirectory) SourcePath(relpath string) (string, error) {
 	return naive, nil
 }
 
+type ListResult struct {
+	Path    string
+	Entries []os.FileInfo
+}
+
 // ListPath gets all the files relevent to the UI in the given directory
 // (the subdirectories and *.tex files)
 // It is expected that the provided directory has already gone through SourcePath
-func (d *SourceDirectory) ListPath(directory string) ([]os.FileInfo, error) {
+func (d *SourceDirectory) ListPath(directory string) (*ListResult, error) {
 	info, err := ioutil.ReadDir(directory)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read %s: %w", directory, err)
@@ -48,5 +53,12 @@ func (d *SourceDirectory) ListPath(directory string) ([]os.FileInfo, error) {
 		}
 	}
 	info = info[:len(info)-removed]
-	return info, nil
+	name := strings.TrimPrefix(directory, d.sourcePath)
+	if name == "" {
+		name = "/"
+	}
+	return &ListResult{
+		Path:    name,
+		Entries: info,
+	}, nil
 }
